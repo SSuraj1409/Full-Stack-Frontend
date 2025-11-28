@@ -1,3 +1,5 @@
+// This array stores all the lessons available on the website.
+// Each lesson is an object with details like subject, price, rating, etc.
 let lessonData = [
   {
     id: 1,
