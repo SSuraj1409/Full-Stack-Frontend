@@ -17,7 +17,7 @@
 </head>
 
 <body>
-    <div id="app">             <!-- Vue root element -->
+    <div id="app"> <!-- Vue root element -->
 
         <!-- HEADER SECTION -->
         <header>
@@ -62,7 +62,8 @@
 
                     <!-- Search bar -->
                     <div class="search-container">
-                        <input type="text" v-model="searchQuery" placeholder="🔍 Search lesson..." class="search-bar" />
+                        <input type="text" v-model="searchQuery" placeholder="🔍 Search lesson..." class="search-bar"
+                            @input="handleSearchInput" />
                     </div>
 
                     <!-- Grid of lessons -->
@@ -102,84 +103,106 @@
             </div>
 
 
-            <!-- CART PAGE (Shown when showCart is true) -->
-            <section v-else class="cart-section">
-                <div class="cart-items">
-                    <h2>Cart Items</h2>
+            <div v-if="showCart">
 
-                    <!-- If cart is empty show this message -->
-                    <div v-if="cart.length === 0">
-                        <p>No lessons in cart.</p>
+                <!-- If cart is empty -->
+                <div v-if="cart.length === 0">
+
+                    <div v-if="orderCompleted" class="order-placeholder">
+                        <div class="emoji">😎</div>
+                        <h2>All done! Your cart is empty.</h2>
                     </div>
 
-                    <!-- Cart items list -->
-                    <div v-else class="cart-list">
+                    <div v-else class="order-placeholder">
+                        <div class="emoji">🛒</div>
+                        <h2>No lessons in the cart.</h2>
+                    </div>
 
-                        <!-- Loop through items in cart -->
-                        <div v-for="item in cart" :key="item.cartId" class="cart-item">
-                            <div class="cart-item-info">
+                </div>
 
-                                <!-- Cart item image -->
-                                <img :src="item.image" :alt="item.subject" class="lesson-img" />
 
-                                <!-- Display all item details -->
-                                <p><strong>Lesson ID:</strong> {{ item.id }}</p>
-                                <p><strong>Subject:</strong> {{ item.subject }}</p>
-                                <p><strong>Location:</strong> {{ item.location }}</p>
-                                <p><strong>Price:</strong> ${{ item.price.toFixed(2) }}</p>
 
-                                <!-- Star rating display -->
-                                <div class="rating">
-                                    <i v-for="n in 5" :key="n"
-                                        :class="n <= item.rating ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+                <!-- Cart page (Shown when showCart is true) -->
+                <section v-else class="cart-section">
+                    <div class="cart-items">
+                        <h2>Cart Items</h2>
+
+                        <!-- If cart is empty show this message -->
+                        <div v-if="cart.length === 0">
+                            <p>No lessons in cart.</p>
+                        </div>
+
+                        <!-- Cart items list -->
+                        <div v-else class="cart-list">
+
+                            <!-- Loop through items in cart -->
+                            <div v-for="item in cart" :key="item.cartId" class="cart-item">
+                                <div class="cart-item-info">
+
+                                    <!-- Cart item image -->
+                                    <img :src="item.image" :alt="item.subject" class="lesson-img" />
+
+                                    <!-- Display all item details -->
+                                    <p><strong>Lesson ID:</strong> {{ item.id }}</p>
+                                    <p><strong>Subject:</strong> {{ item.subject }}</p>
+                                    <p><strong>Location:</strong> {{ item.location }}</p>
+                                    <p><strong>Price:</strong> ${{ item.price.toFixed(2) }}</p>
+
+                                    <!-- Star rating display -->
+                                    <div class="rating">
+                                        <i v-for="n in 5" :key="n"
+                                            :class="n <= item.rating ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Remove button -->
-                            <button @click="removeFromCart(item)">Remove</button>
+                                <!-- Remove button -->
+                                <button @click="removeFromCart(item)">Remove</button>
+                            </div>
+                        </div>
+
+                        <!-- Total price of all cart items -->
+                        <div class="cart-total">
+                            Total: £{{ totalPrice.toFixed(2) }}
                         </div>
                     </div>
 
-                    <!-- Total price of all cart items -->
-                    <div class="cart-total">
-                        Total: £{{ totalPrice.toFixed(2) }}
+                    <!-- Checkout Section -->
+                    <div class="checkout">
+                        <h2>Customer Details</h2>
+                        <div class="checkout-form">
+
+                            <!-- Full Name Input -->
+                            <label>Full Name:</label>
+                            <input type="text" v-model="name" placeholder="Enter Full Name" />
+
+                            <!-- Phone Number Input -->
+                            <label>Phone Number:</label>
+                            <input type="text" v-model="phone" placeholder="Enter Phone Number" />
+
+                            <!-- Checkout button only enabled when fields valid -->
+                            <button :disabled="!canCheckout" @click="checkout">Checkout</button>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- Pop-up for successful checkout(Shown when showPopup is true) -->
+                <div v-if="showPopup" class="checkout-popup">
+                    <div class="checkout-popup-content">
+                        <h2>Thank You!</h2>
+                        <p>{{ checkoutMessage }}</p>
+                        <button @click="closePopup">Close</button>
                     </div>
                 </div>
-
-                <!-- Checkout Section -->
-                <div class="checkout">
-                    <h2>Customer Details</h2>
-                    <div class="checkout-form">
-
-                        <!-- Full Name Input -->
-                        <label>Full Name:</label>
-                        <input type="text" v-model="name" placeholder="Enter Full Name" />
-
-                        <!-- Phone Number Input -->
-                        <label>Phone Number:</label>
-                        <input type="text" v-model="phone" placeholder="Enter Phone Number" />
-
-                        <!-- Checkout button only enabled when fields valid -->
-                        <button :disabled="!canCheckout" @click="checkout">Checkout</button>
-                    </div>
-                </div>
-            </section>
-
-
-            <!-- Pop-up for successful checkout(Shown when showPopup is true) -->
-            <div v-if="showPopup" class="checkout-popup">
-                <div class="checkout-popup-content">
-                    <h2>Thank You!</h2>
-                    <p>{{ checkoutMessage }}</p>
-                    <button @click="closePopup">Close</button>
-                </div>
-            </div>
         </main>
     </div>
 
     <!-- External JS files -->
-    <script src="lessonData.js"></script>  <!-- Contains lesson data array -->
-    <script src="vue.js"></script>         <!-- Contains Vue instance and application logic -->
+    <script src="fetchLessons.js"></script>
+    <script src="fetchSearch.js"></script>
+    <script src="fetchOrder.js"></script>
+    <script src="fetchUpdateSpaces.js"></script>
+    <script src="vue.js"></script> <!-- Contains Vue instance and application logic -->
 
 </body>
 
