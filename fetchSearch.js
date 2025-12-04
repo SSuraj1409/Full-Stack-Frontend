@@ -11,7 +11,7 @@ async function fetchSearch(query) {
         // Return the results while adjusting the image path for each lesson
         return data.map(lesson => ({
             ...lesson,                // Keep all original fields
-            image: 'images/' + lesson.image   // Prepend local image folder path
+            image: 'https://full-stack-backend-agtz.onrender.com/images/' + lesson.image   // Prepend local image folder path
         }));
     } catch (err) {
 
