@@ -1,11 +1,15 @@
 
+// Fetch all lessons from the backend API
 async function fetchLessons() {
- 
-  const res = await fetch('http://localhost:3000/lessons');
+  // Send a GET request to the /lessons route on your server
+  const res = await fetch('https://full-stack-backend-agtz.onrender.com/lessons');
+
+  // Convert the server response to JSON format
   const data = await res.json();
 
+  // Map through each lesson and fix the image path
   return data.map(lesson => ({
-    ...lesson,
-    image: 'images/' + lesson.image  
+    ...lesson,    // Keep all original fields
+    image: 'https://full-stack-backend-agtz.onrender.com/images/' + lesson.image  // Add correct local image folder path
   }));
 }
